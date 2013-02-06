@@ -66,7 +66,7 @@ Lens.prototype.add = function(component){
     }
     
     // Transform angular coordinates and distances to pixel coordinate system:
-    coords = this.ang2pix({x:component.x, y:component.y})
+    var coords = this.ang2pix({x:component.x, y:component.y})
     component.x = coords.x
     component.y = coords.y
     if(component.plane == "lens") component.theta_e = component.theta_e / this.pixscale
@@ -81,9 +81,13 @@ Lens.prototype.add = function(component){
 //----------------------------------------------------------------------------
 // Coordinate transformations
 Lens.prototype.pix2ang = function(pix){
-    return { x: (pix.x - this.w/2)*this.pixscale , y: (pix.y - this.h/2)*this.pixscale }
+	// Check inputs
+    if(!pix || typeof pix.x!=="number" || typeof pix.y!=="number") return { x: 0, y: 0 };
+    return { x: (pix.x - this.w/2)*this.pixscale , y: (pix.y - this.h/2)*this.pixscale };
 }
 Lens.prototype.ang2pix = function(ang){
+	// Check inputs
+    if(!ang || typeof ang.x!=="number" || typeof ang.y!=="number") return { x: 0, y: 0 };
     return { x: Math.round(ang.x / this.pixscale + this.w/2), y: Math.round(ang.y / this.pixscale + this.h/2) } 
 }
 //----------------------------------------------------------------------------
