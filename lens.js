@@ -12,16 +12,10 @@ function Lens(input){
 	this.w = (input && typeof input.width=="number") ? input.width : 0;
 	this.h = (input && typeof input.height=="number") ? input.height : 0;
 
-	this.scale = 1;
-	this.setScale(4);
+	this.scale = 4;
 
 	// An array of lens components
-	this.lens = [
-		{theta_e: 10.0, x: parseInt(this.w/2)+ 0.0*this.scale, y: parseInt(this.h/2)- 0.0*this.scale},
-		{theta_e:  3.0, x: parseInt(this.w/2)- 7.0*this.scale, y: parseInt(this.h/2)-27.0*this.scale},
-		{theta_e:  3.0, x: parseInt(this.w/2)+37.0*this.scale, y: parseInt(this.h/2)+37.0*this.scale},
-		{theta_e:  3.0, x: parseInt(this.w/2)+17.0*this.scale, y: parseInt(this.h/2)+52.0*this.scale},
-	];
+	this.lens = [];
 
 	// Let's put a source in the centre
 	this.source = { x: parseInt(this.w/2), y: parseInt(this.h/2) };
@@ -37,8 +31,16 @@ function Lens(input){
 	return this; // Return the Lens
 }
 
+Lens.prototype.addLensComponent = function(component){
+	this.lens.push(component);
+	
+	return this; // Allow this function to be chainable
+}
+
 Lens.prototype.setScale = function(s){
 	this.scale = s;
+
+	return this; // Allow this function to be chainable
 }
 
 // This function will populate this.alpha
