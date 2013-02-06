@@ -40,7 +40,7 @@ function Lens(input){
     this.predictedimage = new Array(this.w*this.h);
     // 2) arrays to hold vector alpha at each (x,y)
     this.alpha = new Array(this.w*this.h);
-    // 2) arrays to hold tensor magnification at each (x,y)
+    // 3) arrays to hold tensor magnification (kappa, gamma etc) at each (x,y)
     this.mag = new Array(this.w*this.h);
     
     return this; // Return the Lens, ready to be manipulated.
@@ -133,7 +133,7 @@ Lens.prototype.calculateAlpha = function(){
     }
     // TO BE CONTINUED...
     // Calculate critical curve as set of x,y points:
-    //   this.critcurve = contour(this.w,this.h,this.mag[i].inverse,0.0)
+    //   this.critcurve = contour(this.w,this.h,this.mag.inverse,0.0)
     // Map to the source plane to get corresponding caustic:
     //   this.caustic = this.map(this.critcurve,this.alpha)
     return this; // Allow this function to be chainable
