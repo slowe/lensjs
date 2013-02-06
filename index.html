@@ -49,8 +49,11 @@
 		// "this" refers to the canvas object.
 		paper.bind("mousemove",{lens:thelens},function(e){
 
+			// Remove existing sources
+			e.data.lens.removeAll('source');
+
 			// Set the lens source to the current cursor position
-			e.data.lens.source = { x: e.x, y: e.y };
+			e.data.lens.add({ plane: 'source', size:  1.25, x: e.x, y: e.y });
 
 			// Reset the drawing area - "this" is the canvas in this context
 			this.pasteFromClipboard();
@@ -105,10 +108,10 @@
 		// Add a circle+label to show where the source is
 		var r = 5;
 		canvas.ctx.beginPath();
-		canvas.ctx.arc(lens.source.x-parseInt(r/2), lens.source.y-parseInt(r/2), r, 0 , 2 * Math.PI, false);
+		canvas.ctx.arc(lens.source[0].x-parseInt(r/2), lens.source[0].y-parseInt(r/2), r, 0 , 2 * Math.PI, false);
 		canvas.ctx.fillStyle = "#FF9999";
 		canvas.ctx.strokeStyle = "#FFFFFF";
-		canvas.ctx.strokeText("Source",lens.source.x+r, lens.source.y+r);
+		canvas.ctx.strokeText("Source",lens.source[0].x+r, lens.source[0].y+r);
 		canvas.ctx.fill();
 		canvas.ctx.closePath();
 

@@ -64,24 +64,20 @@ Lens.prototype.add = function(component){
 
     if(!component) return this;
 
-    if(!component.plane || typeof component.planet!=="string") return this;
+    if(!component.plane || typeof component.plane!=="string") return this;
 
-    if(component.plane != "lens" && !component.plane != "source") return this;
+    if(component.plane != "lens" && component.plane != "source") return this;
 
     if(component.plane == "lens"){
 
-    if(!component.x || !component.y || !component.theta_e) return this;
-
-    if(typeof component.x!=="number" || typeof component.y!=="number" || typeof component.theta_e!=="number") return this;
+        if(typeof component.x!=="number" || typeof component.y!=="number" || typeof component.theta_e!=="number") return this;
 
     }else if (component.plane == "source"){
 
-    if(!component.x || !component.y || !component.size) return this;
-
-    if(typeof component.x!=="number" || typeof component.y!=="number" || typeof component.size!=="number") return this;
+        if(typeof component.x!=="number" || typeof component.y!=="number" || typeof component.size!=="number") return this;
 
     }
-
+console.log(component)
     
     // Rescale angular coordinates and distances to pixels
     component.x = Math.round(component.x / this.pixscale + this.w/2)
@@ -95,6 +91,13 @@ Lens.prototype.add = function(component){
     return this; // Allow this function to be chainable
 }
 
+Lens.prototype.removeAll = function(plane){
+	if(!plane) return this;
+	if(typeof plane !== "string") return this;
+	if(plane == "source") this.source = [];
+	if(plane == "lens") this.lens = [];
+	return this;
+}
 
 // This function will populate this.alpha
 Lens.prototype.calculateAlpha = function(){
