@@ -24,6 +24,7 @@
 		// Take a copy of the blank <canvas>
 		paper.copyToClipboard();
 	
+
 		// Create an instance of a lens
 		var thelens = new Lens({ 'width': paper.width, 'height': paper.height});
 
@@ -32,6 +33,7 @@
 		thelens.addLensComponent({theta_e:  3.0, x: parseInt(thelens.w/2)- 7.0*thelens.scale, y: parseInt(thelens.h/2)-27.0*thelens.scale});
 		thelens.addLensComponent({theta_e:  3.0, x: parseInt(thelens.w/2)+37.0*thelens.scale, y: parseInt(thelens.h/2)+37.0*thelens.scale});
 		thelens.addLensComponent({theta_e:  3.0, x: parseInt(thelens.w/2)+17.0*thelens.scale, y: parseInt(thelens.h/2)+52.0*thelens.scale});
+
 
 		// Calculate the alpha(x,y)
 		thelens.calculateAlpha();
@@ -355,7 +357,6 @@
 		if (style && style.length === 0) style = null;
 		return style;
 	}
-	// --->
 	</script>
 
 	<style type="text/css">
@@ -399,7 +400,7 @@
 	<div id="page">
 		<header class="inner">
 			<a id="forkme_banner" href="https://github.com/slowe/lensjs">Fork Me on GitHub</a>
-			<h1>Lens Toy</h1>
+			<h1>Lens.js Test</h1>
 		</header>
 
 		<div id="main">
