@@ -55,8 +55,8 @@
 			e.data.lens.removeAll('source');
 
 			// Set the lens source to the current cursor position, transforming pixel coords to angular coords:
-			coords = e.data.lens.pix2ang({x:e.x, y:e.y})
-            e.data.lens.add({ plane: 'source', size:  1.25, x: coords.x, y: coords.y });
+			coords = e.data.lens.pix2ang({x:e.x, y:e.y});
+			e.data.lens.add({ plane: 'source', size:  1.25, x: coords.x, y: coords.y });
 
 			// Reset the drawing area - "this" is the canvas in this context
 			this.pasteFromClipboard();
@@ -155,15 +155,17 @@
 		canvas.overlay(imgData);
 
 		if(mode == "image"){
-			// Add a circle+label to show where the source is
-			var r = 5;
-			canvas.ctx.beginPath();
-			canvas.ctx.arc(lens.source[0].x-parseInt(r/2), lens.source[0].y-parseInt(r/2), r, 0 , 2 * Math.PI, false);
 			canvas.ctx.fillStyle = "#FF9999";
 			canvas.ctx.strokeStyle = "#FFFFFF";
-			canvas.ctx.strokeText("Source",lens.source[0].x+r, lens.source[0].y+r);
-			canvas.ctx.fill();
-			canvas.ctx.closePath();
+			for(var i = 0 ; i < lens.source.length ; i++){
+				// Add a circle+label to show where the source is
+				var r = 5;
+				canvas.ctx.beginPath();
+				canvas.ctx.arc(lens.source[i].x-parseInt(r/2), lens.source[i].y-parseInt(r/2), r, 0 , 2 * Math.PI, false);
+				canvas.ctx.strokeText("Source",lens.source[i].x+r, lens.source[i].y+r);
+				canvas.ctx.fill();
+				canvas.ctx.closePath();
+			}
 		}
 
 	}
