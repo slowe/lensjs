@@ -40,6 +40,8 @@ Lens.prototype.addLensComponent = function(component){
 	
     // Check component is sensible... TBD!
     
+    //
+    
     this.lens.push(component);
 	
 	return this; // Allow this function to be chainable
