@@ -52,8 +52,9 @@
 			// Remove existing sources
 			e.data.lens.removeAll('source');
 
-			// Set the lens source to the current cursor position
-			e.data.lens.add({ plane: 'source', size:  1.25, x: e.x, y: e.y });
+			// Set the lens source to the current cursor position, transforming pixel coords to angular coords:
+			coords = e.data.lens.pix2ang({x:e.x, y:e.y})
+            e.data.lens.add({ plane: 'source', size:  1.25, x: coords.x, y: coords.y });
 
 			// Reset the drawing area - "this" is the canvas in this context
 			this.pasteFromClipboard();

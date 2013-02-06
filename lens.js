@@ -19,16 +19,16 @@ function Lens(input){
     this.lens = [];
     // An array of source components:
     this.source = [];
-    
     // Some working arrays:
     this.predictedimage = [];
     this.alpha = []
       
-      // Sanity check the input. We must get a width, a height and a pixscale (arcseconds/pixel)
+    // Sanity check the input. We must get a width, a height and a pixscale (arcseconds/pixel)
     if(!input) return this;
     if(input.width && typeof input.width!=="number") return this;
     if(input.height && typeof input.height!=="number") return this;
     if(input.pixscale && typeof input.pixscale!=="number") return this;
+    
     // Process any input parameters
     this.w = input.width;
     this.h = input.height;
@@ -38,17 +38,18 @@ function Lens(input){
     this.predictedimage = new Array(this.w*this.h);
     // 2) array to hold alpha at each (x,y)
     this.alpha = new Array(this.w*this.h);
-    return this; // Return the Lens
+    
+    return this; // Return the Lens, ready to be manipulated.
 }
 Lens.prototype.add = function(component){
     
 // Input is an object containing:
 //   plane - e.g. 'lens' or 'source'
 //   x and y positions (arcsec relative to centre of grid)
-//  lenses only: theta_e (SIS model, in arcsec)
-//  sources only: size (Gaussian sigma, in arcsec)
+//   lenses only: theta_e (SIS model, in arcsec)
+//   sources only: size (Gaussian sigma, in arcsec)
     
-    // Check inputs... inputs are in arcseconds
+    // Check inputs... coordinates/distances are in arcseconds
     if(!component) return this;
     if(!component.plane || typeof component.plane!=="string") return this;
     if(component.plane != "lens" && component.plane != "source") return this;
@@ -58,24 +59,24 @@ Lens.prototype.add = function(component){
         if(typeof component.x!=="number" || typeof component.y!=="number" || typeof component.size!=="number") return this;
     }
     
-    // Rescale angular coordinates and distances to pixels
-    component.x = Math.round(component.x / this.pixscale + this.w/2)
-    component.y = Math.round(component.y / this.pixscale + this.h/2)
-    if(component.plane == "lens") component.theta_e = Math.round(component.theta_e / this.pixscale)
-    if(component.plane == "source") component.size = Math.round(component.size / this.pixscale)
+    // Transform angular coordinates and distances to pixel coordinate system:
+    coords = this.ang2pix({x:component.x, y:component.y})
+    component.x = coords.x
+    component.y = coords.y
+    if(component.plane == "lens") component.theta_e = component.theta_e / this.pixscale
+    if(component.plane == "source") component.size = component.size / this.pixscale
     
+    // Push the component into the relevant array:
     if(component.plane == "lens") this.lens.push(component);
     if(component.plane == "source") this.source.push(component);
     
     return this; // Allow this function to be chainable
 }
-Lens.prototype.xy2ang = function(xy){
-    return { x: (xy.x - this.w/2)*this.pixscale , y: (xy.y - this.h/2)*this.pixscale }
+Lens.prototype.pix2ang = function(pix){
+    return { x: (pix.x - this.w/2)*this.pixscale , y: (pix.y - this.h/2)*this.pixscale }
 }
-Lens.prototype.ang2xy = function(ang){
-
-    return Math.round(ang. / this.pixscale + this.w/2)
-
+Lens.prototype.ang2pix = function(ang){
+    return { x: Math.round(ang.x / this.pixscale + this.w/2), y: Math.round(ang.y / this.pixscale + this.h/2) } 
 }
 Lens.prototype.removeAll = function(plane){
     if(!plane) return this;
@@ -84,7 +85,7 @@ Lens.prototype.removeAll = function(plane){
     if(plane == "lens") this.lens = [];
     return this;
 }
-// This function will populate this.alpha
+// This function will populate this.alpha:
 Lens.prototype.calculateAlpha = function(){
     // Set array to zero initially
     for(var i = 0 ; i < this.w*this.h ; i++){
