@@ -28,7 +28,7 @@
 		// Create an instance of a lens,
 		var thelens = new Lens({ 'width': paper.width, 'height': paper.height, 'pixscale':0.25});
 
-		// and add its lens mass and source brightness components:
+		// and add its lens mass and source brightness components (units=arcseconds):
 		thelens.add({plane: "lens", theta_e: 10.0, x:  0.0, y:   0.0});
 		thelens.add({plane: "lens", theta_e:  3.0, x:  7.0, y: -27.0});
 		thelens.add({plane: "lens", theta_e:  3.0, x: 37.0, y:  37.0});
@@ -45,8 +45,10 @@
 		drawLens(thelens, paper);
 
 
-		// Bind to the mousemove event. Inside the function 
-		// "this" refers to the canvas object.
+		// Bind to the mousemove event. Inside the function "this" refers 
+		// to the Canvas object. It gets called at some future point so we 
+		// will pass in our lens object too so we make sure we can see it.
+		// Inside the function thelens will be e.data.lens.
 		paper.bind("mousemove",{lens:thelens},function(e){
 
 			// Remove existing sources
@@ -62,7 +64,7 @@
 			// Re-calculate the lensed image
 			e.data.lens.calculateImage();
 
-			// Draw the image to the canvas ("this");
+			// Draw the image to the canvas (which is "this" in the current context);
 			drawLens(e.data.lens, this)
 
 		});
