@@ -100,7 +100,7 @@ Lens.prototype.removeAll = function(plane){
     return this;
 }
 //----------------------------------------------------------------------------
-// This function will populate this.alpha and this.imag, and compute critical curves and caustics:
+// This function will populate this.alpha and this.mag, and compute critical curves and caustics:
 Lens.prototype.calculateAlpha = function(){
 
     // Set arrays to zero initially:
