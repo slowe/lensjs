@@ -25,23 +25,23 @@
 		paper.copyToClipboard();
 	
 
-		// Create an instance of a lens
-		var thelens = new Lens({ 'width': paper.width, 'height': paper.height});
+		// Create an instance of a lens,
+		var thelens = new Lens({ 'width': paper.width, 'height': paper.height, 'pixscale':0.25});
 
-		// We will add the lens components
-		thelens.addLensComponent({theta_e: 10.0, x: parseInt(thelens.w/2)+ 0.0*thelens.scale, y: parseInt(thelens.h/2)- 0.0*thelens.scale});
-		thelens.addLensComponent({theta_e:  3.0, x: parseInt(thelens.w/2)- 7.0*thelens.scale, y: parseInt(thelens.h/2)-27.0*thelens.scale});
-		thelens.addLensComponent({theta_e:  3.0, x: parseInt(thelens.w/2)+37.0*thelens.scale, y: parseInt(thelens.h/2)+37.0*thelens.scale});
-		thelens.addLensComponent({theta_e:  3.0, x: parseInt(thelens.w/2)+17.0*thelens.scale, y: parseInt(thelens.h/2)+52.0*thelens.scale});
+		// and add its lens mass and source brightness components:
+		thelens.add({plane: "lens", theta_e: 10.0, x:  0.0, y:   0.0});
+		thelens.add({plane: "lens", theta_e:  3.0, x:  7.0, y: -27.0});
+		thelens.add({plane: "lens", theta_e:  3.0, x: 37.0, y:  37.0});
+		thelens.add({plane: "lens", theta_e:  3.0, x: 17.0, y:  52.0});
+        thelens.add({plane: "source", size:  1.25, x: 0.0, y:  0.0});
 
-
-		// Calculate the alpha(x,y)
+		// Calculate the deflection angle vector field, alpha(x,y):
 		thelens.calculateAlpha();
 
-		// Calculate the lensed image
+		// Now use this to calculate the lensed image:
 		thelens.calculateImage();
 
-		// Draw the lens image to the canvas
+		// Draw the lens image to the canvas!
 		drawLens(thelens, paper);
 
 
