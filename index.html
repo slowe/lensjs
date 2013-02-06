@@ -42,7 +42,7 @@
 		thelens.calculateImage();
 
 		// Draw the lens image to the canvas!
-		drawLens(thelens, paper);
+		drawAll(thelens, paper);
 
 
 		// Bind to the mousemove event. Inside the function "this" refers 
@@ -61,118 +61,110 @@
 			// Reset the drawing area - "this" is the canvas in this context
 			this.pasteFromClipboard();
 
+			// We are only changing the lens so the kappa and magnification 
+			// maps haven't changed. Therefore we can use the versions we
+			// saved previously within drawAll().
+			this.overlayFromClipboard("lens");
+			this.overlayFromClipboard("mag");
+
 			// Re-calculate the lensed image
 			e.data.lens.calculateImage();
 
 			// Draw the image to the canvas (which is "this" in the current context);
-			drawLens(e.data.lens, this)
+			drawComponent("image", e.data.lens, this);
 
 		});
-
 
 	}
 
 
 	// We are going to keep the lens.js library independent of 
 	// the DOM/<canvas> so we need a function that goes through
-	// lens.predictedimage building an RGBA image and then 
-	// drawing it to the canvas.
-	function drawLens(lens, canvas){
+	// building an RGBA image and drawing it to the canvas.
+	function drawAll(lens,canvas){
+
+		drawComponent("lens", lens, canvas);
+
+		drawComponent("mag", lens, canvas);
+
+		drawComponent("image", lens, canvas);
+
+	}
+
+	// Draw a specific component of the Lens object
+	function drawComponent(mode, lens, canvas){
+
+		// Inputs are:
+		//   mode - e.g. 'lens', 'mag' or 'image'
+		//   lens - the Lens object we will draw
+		//   canvas - the Canvas object to draw to
+
+		if(!mode || typeof mode!=="string") return;
 
 		// -------------------------
         // Create the lens mass distribution
-		var lensData = canvas.ctx.createImageData(lens.w, lens.h);
+		var imgData = canvas.ctx.createImageData(lens.w, lens.h);
 		var pos = 0;
+		var c = [0, 0, 0];
+
+		// The RGB colours
+		if(mode == "lens") c = [60, 60, 60];
+		else if(mode == "mag") c = [0, 120, 0];
+		else if(mode == "image") c = [195, 215, 255];
 		
 		// Loop over the kappa map
 		for(var i = 0; i < lens.w*lens.h ; i++){
 
 			// Add to red channel
-			lensData.data[pos+0] = 60;
+			imgData.data[pos+0] = c[0];
 
 			// Add to green channel
-			lensData.data[pos+1] = 60;
+			imgData.data[pos+1] = c[1];
 
 			// Add to blue channel
-			lensData.data[pos+2] = 60;
+			imgData.data[pos+2] = c[2];
 
 			// Alpha channel
-			// MAGIC number 0.7
-			lensData.data[pos+3] = Math.round(0.7*255)*Math.sqrt(lens.mag[i].kappa);
+			if(mode == "lens"){
+				// MAGIC number 0.7
+				imgData.data[pos+3] = Math.round(0.7*255)*Math.sqrt(lens.mag[i].kappa);
+			}else if(mode == "mag"){
+				// Alpha channel
+				// MAGIC number 0.01
+				imgData.data[pos+3] = Math.round(0.01*255)/Math.abs(lens.mag[i].inverse);
+			}else if(mode == "image"){
+				// Alpha channel
+				// MAGIC number 0.1, trades off with blur steps...
+				imgData.data[pos+3] = Math.round(0.1*255)*lens.predictedimage[i];
+			}else{
+				imgData.data[pos+3] = 255;
+			}
 
 			pos += 4;
 		}
 
-		// Draw the image to the <canvas> in the DOM
-		canvas.overlay(lensData);
-        
-		// -------------------------
-        // Create the lens magnification
-		var magData = canvas.ctx.createImageData(lens.w, lens.h);
-		var pos = 0;
-		
-		// Loop over the kappa map
-		for(var i = 0; i < lens.w*lens.h ; i++){
-
-			// Add to red channel
-			magData.data[pos+0] = 0;
-
-			// Add to green channel
-			magData.data[pos+1] = 120;
-
-			// Add to blue channel
-			magData.data[pos+2] = 0;
-
-			// Alpha channel
-			// MAGIC number 0.01
-			magData.data[pos+3] = Math.round(0.01*255)/Math.abs(lens.mag[i].inverse);
-
-			pos += 4;
+		if(mode == "image"){
+			// Blur the image
+			imgData = canvas.blur(imgData, lens);
 		}
 
+		// Keep a copy of the image in a clipboard named <mode>
+		canvas.copyToClipboard(mode,imgData);
+
 		// Draw the image to the <canvas> in the DOM
-		canvas.overlay(magData);
-        
-		// -------------------------
-		// Create the image plane
-		var imageData = canvas.ctx.createImageData(lens.w, lens.h);
-		var pos = 0;
-		
-		// Loop over the predicted image
-		for(var i = 0; i < lens.w*lens.h ; i++){
+		canvas.overlay(imgData);
 
-			// Add to red channel
-			imageData.data[pos+0] = 195;
-
-			// Add to green channel
-			imageData.data[pos+1] = 215;
-
-			// Add to blue channel
-			imageData.data[pos+2] = 255;
-
-			// Alpha channel
-			// MAGIC number 0.1, trades off with blur steps...
-			imageData.data[pos+3] = Math.round(0.1*255)*lens.predictedimage[i];
-
-			pos += 4;
+		if(mode == "image"){
+			// Add a circle+label to show where the source is
+			var r = 5;
+			canvas.ctx.beginPath();
+			canvas.ctx.arc(lens.source[0].x-parseInt(r/2), lens.source[0].y-parseInt(r/2), r, 0 , 2 * Math.PI, false);
+			canvas.ctx.fillStyle = "#FF9999";
+			canvas.ctx.strokeStyle = "#FFFFFF";
+			canvas.ctx.strokeText("Source",lens.source[0].x+r, lens.source[0].y+r);
+			canvas.ctx.fill();
+			canvas.ctx.closePath();
 		}
-
-		// Blur the image
-		imageData = canvas.blur(imageData, lens);
-		
-		// Draw the image to the <canvas> in the DOM
-		canvas.overlay(imageData);
-
-		// -------------------------
-		// Add a circle+label to show where the source is
-		var r = 5;
-		canvas.ctx.beginPath();
-		canvas.ctx.arc(lens.source[0].x-parseInt(r/2), lens.source[0].y-parseInt(r/2), r, 0 , 2 * Math.PI, false);
-		canvas.ctx.fillStyle = "#FF9999";
-		canvas.ctx.strokeStyle = "#FFFFFF";
-		canvas.ctx.strokeText("Source",lens.source[0].x+r, lens.source[0].y+r);
-		canvas.ctx.fill();
-		canvas.ctx.closePath();
 
 	}
 
@@ -207,6 +199,8 @@
 		this.width = (input && typeof input.width=="number") ? input.width : parseInt(getStyle(this.id, 'width'), 10);
 		this.height = (input && typeof input.height=="number") ? input.height : parseInt(getStyle(this.id, 'height'), 10);
 		this.events = { load:"", click:"", mousemove:"" };	// Let's define some events
+		this.clipboard = {};
+		this.clipboardData = {};
 
 		// Now we want to build the <canvas> element that will hold our image
 		var el = document.getElementById(this.id);
@@ -313,24 +307,38 @@
 		this.ctx.drawImage(overlayCanvas, 0, 0);
 	}
 
-
-	Canvas.prototype.copyToClipboard = function(){
+	Canvas.prototype.overlayFromClipboard = function(name){
 		if(this.ctx){
+			if(!name || typeof name!=="string") name = "default";
+			if(!this.clipboard[name]) return this;
+
+			this.overlay(this.clipboard[name]);
+		}
+		return this;
+	}
+
+	Canvas.prototype.copyToClipboard = function(name,img){
+		if(this.ctx){
+			if(!name || typeof name!=="string") name = "default";
+
 			// Will fail if the browser thinks the image was cross-domain
 			try {
-				this.clipboard = this.ctx.getImageData(0, 0, this.width, this.height);
-				this.clipboardData = this.clipboard.data;
+				this.clipboard[name] = (img) ? img : this.ctx.getImageData(0, 0, this.width, this.height);
+				this.clipboardData[name] = this.clipboard[name].data;
 			}catch(e){};
 		}
 		return this;
 	}
 	
-	Canvas.prototype.pasteFromClipboard = function(){
+	Canvas.prototype.pasteFromClipboard = function(name){
 		if(this.ctx){
+			if(!name || typeof name!=="string") name = "default";
+			if(!this.clipboard[name]) return this;
+
 			// Will fail if the browser thinks the image was cross-domain
 			try {
-				this.clipboard.data = this.clipboardData;
-				this.ctx.putImageData(this.clipboard, 0, 0);
+				this.clipboard[name].data = this.clipboardData[name];
+				this.ctx.putImageData(this.clipboard[name], 0, 0);
 			}catch(e){};
 		}
 		return this;
