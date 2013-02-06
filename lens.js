@@ -8,11 +8,16 @@
 
 function Lens(input){
 
+    // INPUTS:
+    //    width       calculation (canvas) grid width in pixels
+    //    height      calculation (canvas) grid height in pixels
+    //    pixscale    pixel scale arcsec per pixel: this is used to 
+    //                   convert angular coordinates and distances to pixels    
+
 	// Process any input parameters
 	this.w = (input && typeof input.width=="number") ? input.width : 0;
 	this.h = (input && typeof input.height=="number") ? input.height : 0;
-
-	this.scale = 4;
+	this.pixscale = (input && typeof input.pixscale=="number") ? input.pixscale : 0;
 
 	// An array of lens components
 	this.lens = [];
@@ -32,16 +37,19 @@ function Lens(input){
 }
 
 Lens.prototype.addLensComponent = function(component){
-	this.lens.push(component);
+	
+    // Check component is sensible... TBD!
+    
+    this.lens.push(component);
 	
 	return this; // Allow this function to be chainable
 }
 
-Lens.prototype.setScale = function(s){
-	this.scale = s;
-
-	return this; // Allow this function to be chainable
-}
+// Lens.prototype.setScale = function(s){
+//	this.scale = s;
+//
+//	return this; // Allow this function to be chainable
+//}
 
 // This function will populate this.alpha
 Lens.prototype.calculateAlpha = function(){
@@ -56,6 +64,7 @@ Lens.prototype.calculateAlpha = function(){
 
 	// Loop over lens components
 	for(var j = 0 ; j < this.lens.length ; j++){
+	    // Loop over grid pixels
 		for(var i = 0 ; i < this.w*this.h ; i++){
 			x = i % this.w - this.lens[j].x;
 			y = Math.floor(i/this.w) - this.lens[j].y;
@@ -64,8 +73,8 @@ Lens.prototype.calculateAlpha = function(){
 			sinphi = y/r;
 			
 			// Add on contribution from this component
-			this.alpha[i].x += this.lens[j].theta_e*this.scale*cosphi;
-			this.alpha[i].y += this.lens[j].theta_e*this.scale*sinphi;
+			this.alpha[i].x += (this.lens[j].theta_e/this.pixscale)*cosphi;
+			this.alpha[i].y += (this.lens[j].theta_e/this.pixscale)*sinphi;
 		}
 	}
 

@@ -6,7 +6,6 @@
 	<script src="lens.js"></script>
 	<!--[if lt IE 9]><script src="excanvas.min.js"></script><![endif]-->
 	<script type="text/javascript">
-	<!--
 	// Lens.js test-bed
 	// ================
 	// The aim is to have a library - lens.js - that mostly contains a
@@ -25,7 +24,6 @@
 		// Take a copy of the blank <canvas>
 		paper.copyToClipboard();
 	
-
 		// Create an instance of a lens
 		var thelens = new Lens({ 'width': paper.width, 'height': paper.height});
 
@@ -34,7 +32,6 @@
 		thelens.addLensComponent({theta_e:  3.0, x: parseInt(thelens.w/2)- 7.0*thelens.scale, y: parseInt(thelens.h/2)-27.0*thelens.scale});
 		thelens.addLensComponent({theta_e:  3.0, x: parseInt(thelens.w/2)+37.0*thelens.scale, y: parseInt(thelens.h/2)+37.0*thelens.scale});
 		thelens.addLensComponent({theta_e:  3.0, x: parseInt(thelens.w/2)+17.0*thelens.scale, y: parseInt(thelens.h/2)+52.0*thelens.scale});
-
 
 		// Calculate the alpha(x,y)
 		thelens.calculateAlpha();
@@ -358,7 +355,7 @@
 		if (style && style.length === 0) style = null;
 		return style;
 	}
-	// -->
+	// --->
 	</script>
 
 	<style type="text/css">
