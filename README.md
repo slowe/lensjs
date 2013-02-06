@@ -1,7 +1,9 @@
 Lens js
 -------
 
-A gravitational lensing library in Javascript. See also [LensToy](http://slowe.github.com/LensToy/).
+A gravitational lensing library in Javascript. The aim is to have the library contains a gravitational lens object and the mathematics needed to work with the lens. All the Javascript to deal with display in the browser and interaction will be kept separate so that this library can be reused in multiple places.
+
+See also [LensToy](http://slowe.github.com/LensToy/).
 
 
 Credits
