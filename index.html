@@ -80,7 +80,7 @@
 	function drawLens(lens, canvas){
 
 		// -------------------------
-        // Create the lens plane
+        // Create the lens mass distribution
 		var lensData = canvas.ctx.createImageData(lens.w, lens.h);
 		var pos = 0;
 		
@@ -105,6 +105,33 @@
 
 		// Draw the image to the <canvas> in the DOM
 		canvas.overlay(lensData);
+        
+		// -------------------------
+        // Create the lens magnification
+		var magData = canvas.ctx.createImageData(lens.w, lens.h);
+		var pos = 0;
+		
+		// Loop over the kappa map
+		for(var i = 0; i < lens.w*lens.h ; i++){
+
+			// Add to red channel
+			magData.data[pos+0] = 0;
+
+			// Add to green channel
+			magData.data[pos+1] = 120;
+
+			// Add to blue channel
+			magData.data[pos+2] = 0;
+
+			// Alpha channel
+			// MAGIC number 0.01
+			magData.data[pos+3] = Math.round(0.01*255)/Math.abs(lens.mag[i].inverse);
+
+			pos += 4;
+		}
+
+		// Draw the image to the <canvas> in the DOM
+		canvas.overlay(magData);
         
 		// -------------------------
 		// Create the image plane
@@ -443,6 +470,10 @@
 			<div id="lenstoy"></div>
 		</div>
 	
+        <p>The dark matter density is shown in gray, while the green<br>
+        shapes are the "critical curves." This is where the <br>
+        highly-magnified images form. These are shown in blue. </p>
+    
 		<p><a href="https://github.com/slowe/lensjs">https://github.com/slowe/lensjs</a></p>
 	</div>
 
