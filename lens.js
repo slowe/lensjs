@@ -1,3 +1,4 @@
+//----------------------------------------------------------------------------
 /*
  * Javascript Gravitational Lensing Library
  * 2013 Stuart Lowe (http://lcogt.net/), Phil Marshall (University of Oxford)
@@ -5,6 +6,7 @@
  * Licensed under the MPL http://www.mozilla.org/MPL/MPL-1.1.txt
  *
  */
+//----------------------------------------------------------------------------
 function Lens(input){
     // INPUTS:
     //    width       calculation (canvas) grid width in pixels
@@ -36,18 +38,22 @@ function Lens(input){
     // Create 1D arrays
     // 1) array to hold the predicted image
     this.predictedimage = new Array(this.w*this.h);
-    // 2) array to hold alpha at each (x,y)
+    // 2) arrays to hold vector alpha at each (x,y)
     this.alpha = new Array(this.w*this.h);
+    // 2) arrays to hold tensor magnification at each (x,y)
+    this.mag = new Array(this.w*this.h);
     
     return this; // Return the Lens, ready to be manipulated.
 }
+//----------------------------------------------------------------------------
+// Add a component to the model - either lens mass or source brightness
 Lens.prototype.add = function(component){
-    
-// Input is an object containing:
-//   plane - e.g. 'lens' or 'source'
-//   x and y positions (arcsec relative to centre of grid)
-//   lenses only: theta_e (SIS model, in arcsec)
-//   sources only: size (Gaussian sigma, in arcsec)
+
+    // Input is an object containing:
+    //   plane - e.g. 'lens' or 'source'
+    //   x and y positions (arcsec relative to centre of grid)
+    //   lenses only: theta_e (SIS model, in arcsec)
+    //   sources only: size (Gaussian sigma, in arcsec)
     
     // Check inputs... coordinates/distances are in arcseconds
     if(!component) return this;
@@ -72,12 +78,16 @@ Lens.prototype.add = function(component){
     
     return this; // Allow this function to be chainable
 }
+//----------------------------------------------------------------------------
+// Coordinate transformations
 Lens.prototype.pix2ang = function(pix){
     return { x: (pix.x - this.w/2)*this.pixscale , y: (pix.y - this.h/2)*this.pixscale }
 }
 Lens.prototype.ang2pix = function(ang){
     return { x: Math.round(ang.x / this.pixscale + this.w/2), y: Math.round(ang.y / this.pixscale + this.h/2) } 
 }
+//----------------------------------------------------------------------------
+// Cleaning up (typically before replotting)
 Lens.prototype.removeAll = function(plane){
     if(!plane) return this;
     if(typeof plane !== "string") return this;
@@ -85,30 +95,50 @@ Lens.prototype.removeAll = function(plane){
     if(plane == "lens") this.lens = [];
     return this;
 }
-// This function will populate this.alpha:
+//----------------------------------------------------------------------------
+// This function will populate this.alpha and this.imag, and compute critical curves and caustics:
 Lens.prototype.calculateAlpha = function(){
-    // Set array to zero initially
+
+    // Set arrays to zero initially:
     for(var i = 0 ; i < this.w*this.h ; i++){
         this.alpha[i] = { x: 0.0, y: 0.0 };
+        this.mag[i] = {kappa: 0.0, gamma1: 0.0, gamma2: 0.0, inverse: 0.0}
     }
     // Declare outside the for loop for efficiency
     var x, y, r, cosphi, sinphi;
-    // Loop over lens components
-    for(var j = 0 ; j < this.lens.length ; j++){
-        for(var i = 0 ; i < this.w*this.h ; i++){
+    // Loop over pixels:
+    for(var i = 0 ; i < this.w*this.h ; i++){
+        // Loop over lens components:
+        for(var j = 0 ; j < this.lens.length ; j++){
             x = i % this.w - this.lens[j].x;
             y = Math.floor(i/this.w) - this.lens[j].y;
             r = Math.sqrt(x*x+y*y);
             cosphi = x/r;
             sinphi = y/r;
-            
-            // Add on contribution from this component
+            costwophi = 1 - 2*sinphi*sinphi;
+            sintwophi = 2*sinphi*cosphi;
+            // Add lensing effects of just this component:
             this.alpha[i].x += this.lens[j].theta_e*cosphi;
             this.alpha[i].y += this.lens[j].theta_e*sinphi;
+            kappa = 0.5 * this.lens[j].theta_e / r
+            this.mag[i].kappa += kappa;
+            // SIS shortcut:
+            // this.mag[i].gamma1 += kappa * costwophi;
+            // this.mag[i].gamma2 += kappa * sintwophi;
         }
+        // Inverse magnification at this pixel:
+        // this.mag[i].inverse = (1.0-this.mag[i].kappa)*(1.0-this.mag[i].kappa) - this.mag[i].gamma1*this.mag[i].gamma1 - this.mag[i].gamma2*this.mag[i].gamma2
+        // SIS shortcut:
+        this.mag[i].inverse = 1.0 - 2.0*this.mag[i].kappa
     }
+    // TO BE CONTINUED...
+    // Calculate critical curve as set of x,y points:
+    //   this.critcurve = contour(this.w,this.h,this.mag[i].inverse,0.0)
+    // Map to the source plane to get corresponding caustic:
+    //   this.caustic = this.map(this.critcurve,this.alpha)
     return this; // Allow this function to be chainable
 }
+//----------------------------------------------------------------------------
 // This function will populate this.predictedimage
 Lens.prototype.calculateImage = function(){
     // Define some variables outside of the loop
@@ -131,3 +161,4 @@ Lens.prototype.calculateImage = function(){
     
     return this; // Allow this function to be chainable
 }
+//----------------------------------------------------------------------------

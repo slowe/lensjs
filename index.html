@@ -33,7 +33,7 @@
 		thelens.add({plane: "lens", theta_e:  3.0, x:  7.0, y: -27.0});
 		thelens.add({plane: "lens", theta_e:  3.0, x: 37.0, y:  37.0});
 		thelens.add({plane: "lens", theta_e:  3.0, x: 17.0, y:  52.0});
-        thelens.add({plane: "source", size:  1.25, x: 0.0, y:  0.0});
+        thelens.add({plane: "source", size:  1.25, x: 1000.0, y:  1000.0});
 
 		// Calculate the deflection angle vector field, alpha(x,y):
 		thelens.calculateAlpha();
@@ -405,6 +405,7 @@
 		<header class="inner">
 			<a id="forkme_banner" href="https://github.com/slowe/lensjs">Fork Me on GitHub</a>
 			<h1>Lens.js Test</h1>
+            <p>Here's a canvas - put a source in it.</p>
 		</header>
 
 		<div id="main">
