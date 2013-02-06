@@ -50,6 +50,8 @@ function Lens(input){
     this.alpha = new Array(this.w*this.h);
     return this; // Return the Lens
 }
+
+
 Lens.prototype.add = function(component){
     
 // Input is an object containing:
@@ -70,20 +72,7 @@ Lens.prototype.add = function(component){
 
     if(!component.x || !component.y || !component.theta_e) return this;
 
-<<<<<<< HEAD
-Lens.prototype.addLensComponent = function(component){
-	
-    // Check component is sensible... TBD!
-    
-    //
-    
-    this.lens.push(component);
-	
-	return this; // Allow this function to be chainable
-}
-=======
     if(typeof component.x!=="number" || typeof component.y!=="number" || typeof component.theta_e!=="number") return this;
->>>>>>> Modifying the inputs and main functions
 
     }else if (component.plane == "source"){
 
@@ -105,6 +94,8 @@ Lens.prototype.addLensComponent = function(component){
     
     return this; // Allow this function to be chainable
 }
+
+
 // This function will populate this.alpha
 Lens.prototype.calculateAlpha = function(){
     // Set array to zero initially
