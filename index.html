@@ -140,7 +140,7 @@
 			canvas.ctx.beginPath();
 			canvas.ctx.moveTo(c[l][0].x,c[l][0].y);
 			for(i = 1; i < c[l].length ; i++){
-				canvas.ctx.lineTo(Math.round(c[l][i].x),Math.round(c[l][i].y));
+				canvas.ctx.lineTo(c[l][i].x,c[l][i].y);
 			}
 			canvas.ctx.closePath();
 			canvas.ctx.stroke();
