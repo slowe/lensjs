@@ -169,5 +169,5 @@
 		
 		return this; // Allow this function to be chainable
 	}
-	//----------------------------------------------------------------------------
+
 })(typeof exports !== "undefined" ? exports : window);

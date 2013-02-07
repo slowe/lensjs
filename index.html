@@ -17,9 +17,8 @@
 
 
 	// Wait until the DOM has loaded
-	window.onload = function(e){ 
+	window.onload = function(e){
 
-		var c = new Conrec();
 		
 		// Some setting up using a Canvas class that we define below
 		var paper = new Canvas({ 'id': 'lenstoy' });
@@ -47,6 +46,24 @@
 
 		// Draw the lens image to the canvas!
 		drawAll(thelens, paper);
+
+		// If we have the Conrec object available we now try to contour
+		if(typeof Conrec==="function"){
+			// Need to get our 1D array into the right form;
+			// Return our internal 1D representation as a 2D array
+			var i = 0;
+			var data = new Array(thelens.h);
+			for(row = 0 ; row < thelens.h ; row++){
+				data[row] = new Array(thelens.w);
+				for(col = 0 ; col < thelens.w ; col++){
+					data[row][col] = thelens.mag[i].inverse;
+					i++;
+				}
+			}
+			var c = contour(data,[0.0]);
+			console.log(c);
+		}
+
 
 
 		// Bind to the mousemove event. Inside the function "this" refers 
@@ -79,6 +96,39 @@
 
 		});
 
+	}
+
+	// Contour using conrec.js
+	function contour(data,z){
+		// data should be a 2D array
+
+		var c = new Conrec();
+
+		// Check inputs
+		if(typeof data!=="object") return c;
+		if(typeof z!=="object") return c;
+		if(data.length < 1) return c;
+		if(data[0].length < 1) return c;
+
+		
+		var ilb = 0;
+		var iub = data.length-1;
+		var jlb = 0;
+		var jub = data[0].length-1;
+		var idx = new Array(data.length);
+		var jdx = new Array(data[0].length);
+		for(var i = 0 ; i < idx.length ; i++) idx[i] = i+1;
+		for(var j = 0 ; j < jdx.length ; j++) idx[j] = j+1;
+
+		// contour(d, ilb, iub, jlb, jub, x, y, nc, z)
+		// d               ! matrix of data to contour
+		// ilb,iub,jlb,jub ! index bounds of data matrix
+		// x               ! data matrix column coordinates
+		// y               ! data matrix row coordinates
+		// nc              ! number of contour levels
+		// z               ! contour levels in increasing order
+		c.contour(data, ilb, iub, jlb, jub, idx, jdx, z.length, z);
+		return c;
 	}
 
 
