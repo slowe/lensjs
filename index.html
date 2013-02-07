@@ -51,17 +51,18 @@
 		if(typeof Conrec==="function"){
 			// Need to get our 1D array into the right form;
 			// Return our internal 1D representation as a 2D array
-			var i = 0;
+			var i, row, col;
 			var data = new Array(thelens.h);
 			for(row = 0 ; row < thelens.h ; row++){
 				data[row] = new Array(thelens.w);
 				for(col = 0 ; col < thelens.w ; col++){
+					i = row + col*thelens.h;
 					data[row][col] = thelens.mag[i].inverse;
-					i++;
 				}
 			}
 			var c = contour(data,[0.0]);
-			console.log(c);
+			var contours = c.contourList();
+			drawContours(contours, paper)
 		}
 
 
@@ -70,7 +71,7 @@
 		// to the Canvas object. It gets called at some future point so we 
 		// will pass in our lens object too so we make sure we can see it.
 		// Inside the function thelens will be e.data.lens.
-		paper.bind("mousemove",{lens:thelens},function(e){
+		paper.bind("mousemove",{lens:thelens,contours:contours},function(e){
 
 			// Remove existing sources
 			e.data.lens.removeAll('source');
@@ -87,6 +88,7 @@
 			// saved previously within drawAll().
 			this.overlayFromClipboard("lens");
 			this.overlayFromClipboard("mag");
+			drawContours(contours, paper);
 
 			// Re-calculate the lensed image
 			e.data.lens.calculateImage();
@@ -118,7 +120,7 @@
 		var idx = new Array(data.length);
 		var jdx = new Array(data[0].length);
 		for(var i = 0 ; i < idx.length ; i++) idx[i] = i+1;
-		for(var j = 0 ; j < jdx.length ; j++) idx[j] = j+1;
+		for(var j = 0 ; j < jdx.length ; j++) jdx[j] = j+1;
 
 		// contour(d, ilb, iub, jlb, jub, x, y, nc, z)
 		// d               ! matrix of data to contour
@@ -131,6 +133,19 @@
 		return c;
 	}
 
+	function drawContours(c,canvas){
+		var i, j, l;
+		canvas.ctx.strokeStyle = "#FFFFFF";
+		for(l = 0; l < c.length ; l++){
+			canvas.ctx.beginPath();
+			canvas.ctx.moveTo(c[l][0].x,c[l][0].y);
+			for(i = 1; i < c[l].length ; i++){
+				canvas.ctx.lineTo(Math.round(c[l][i].x),Math.round(c[l][i].y));
+			}
+			canvas.ctx.closePath();
+			canvas.ctx.stroke();
+		}
+	}
 
 	// We are going to keep the lens.js library independent of 
 	// the DOM/<canvas> so we need a function that goes through
