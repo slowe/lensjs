@@ -103,7 +103,12 @@
 
 		// -------------------------
         // Create the lens mass distribution
-		var imgData = canvas.ctx.createImageData(lens.w, lens.h);
+        
+        // Have we previously made this component layer?
+		var previous = (canvas.clipboard[mode]) ? true : false;
+
+		// Load in the previous version if we have it (this will save us setting the RGB)
+		var imgData = (previous) ? canvas.clipboard[mode] : canvas.ctx.createImageData(lens.w, lens.h);
 		var pos = 0;
 		var c = [0, 0, 0];
 
@@ -112,44 +117,44 @@
 		else if(mode == "mag") c = [0, 120, 0];
 		else if(mode == "image") c = [195, 215, 255];
 		
-		// Loop over the kappa map
+		// Loop over the components
 		for(var i = 0; i < lens.w*lens.h ; i++){
 
-			// Add to red channel
-			imgData.data[pos+0] = c[0];
-
-			// Add to green channel
-			imgData.data[pos+1] = c[1];
-
-			// Add to blue channel
-			imgData.data[pos+2] = c[2];
+			// If we've not drawn this layer before we should set the RGB
+			if(!previous){
+				// Add to red channel
+				imgData.data[pos+0] = c[0];
+	
+				// Add to green channel
+				imgData.data[pos+1] = c[1];
+	
+				// Add to blue channel
+				imgData.data[pos+2] = c[2];
+			}
 
 			// Alpha channel
 			if(mode == "lens"){
-				// MAGIC number 0.7
-				imgData.data[pos+3] = Math.round(0.7*255)*Math.sqrt(lens.mag[i].kappa);
+				// MAGIC number 0.7 -> Math.round(255*0.7) = 179
+				imgData.data[pos+3] = 179*Math.sqrt(lens.mag[i].kappa);
 			}else if(mode == "mag"){
-				// Alpha channel
-				// MAGIC number 0.01
-				imgData.data[pos+3] = Math.round(0.01*255)/Math.abs(lens.mag[i].inverse);
+				// MAGIC number 0.01 -> Math.round(255*0.01) = 3
+				imgData.data[pos+3] = 3/Math.abs(lens.mag[i].inverse);
 			}else if(mode == "image"){
-				// Alpha channel
-				// MAGIC number 0.1, trades off with blur steps...
-				imgData.data[pos+3] = Math.round(0.1*255)*lens.predictedimage[i];
+				// MAGIC number 0.1, trades off with blur steps... -> Math.round(255*0.1) = 26
+				imgData.data[pos+3] = 26*lens.predictedimage[i];
 			}else{
 				imgData.data[pos+3] = 255;
 			}
-
 			pos += 4;
 		}
+
+		// Keep a copy of the image in a clipboard named <mode>
+		canvas.copyToClipboard(mode,imgData);
 
 		if(mode == "image"){
 			// Blur the image
 			imgData = canvas.blur(imgData, lens);
 		}
-
-		// Keep a copy of the image in a clipboard named <mode>
-		canvas.copyToClipboard(mode,imgData);
 
 		// Draw the image to the <canvas> in the DOM
 		canvas.overlay(imgData);
@@ -444,7 +449,7 @@
 	#lensimg { border: 2px solid #606060; }
 	code { color: #5555aa; }
 	pre { color: #5555aa; }
-	#main { position: relative; height:420px; }
+	#main { position: relative; height:auto; }
 	#status { margin-bottom: 0.5em; }
 	#lenstoy, #lensimg { width:400px; height:400px; }
 	#forkme_banner {
