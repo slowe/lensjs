@@ -3,10 +3,10 @@
 <head>
 	<meta charset='utf-8' />
 	<title>lensjs</title>
+	<!--[if lt IE 9]><script src="excanvas.min.js"></script><![endif]-->
 	<script type="text/javascript" src="lens.js"></script>
 	<script type="text/javascript" src="canvas.js"></script>
 	<script type="text/javascript" src="https://raw.github.com/jasondavies/conrec.js/master/conrec.js"></script>
-	<!--[if lt IE 9]><script src="excanvas.min.js"></script><![endif]-->
 	<script type="text/javascript">
 	// Lens.js test-bed
 	// ================
@@ -47,6 +47,8 @@
 		// Draw the lens image to the canvas!
 		drawAll(thelens, paper);
 
+
+		var contours = [];
 		// If we have the Conrec object available we now try to contour
 		if(typeof Conrec==="function"){
 			// Need to get our 1D array into the right form;
@@ -61,7 +63,7 @@
 				}
 			}
 			var c = contour(data,[0.0]);
-			var contours = c.contourList();
+			contours = c.contourList();
 			drawContours(contours, paper)
 		}
 
@@ -88,7 +90,7 @@
 			// saved previously within drawAll().
 			this.overlayFromClipboard("lens");
 			this.overlayFromClipboard("mag");
-			drawContours(contours, paper);
+			drawContours(contours, this);
 
 			// Re-calculate the lensed image
 			e.data.lens.calculateImage();
@@ -112,7 +114,6 @@
 		if(data.length < 1) return c;
 		if(data[0].length < 1) return c;
 
-		
 		var ilb = 0;
 		var iub = data.length-1;
 		var jlb = 0;
@@ -134,14 +135,15 @@
 	}
 
 	function drawContours(c,canvas){
+		if(c.length < 1) return;
 		var i, j, l;
 		canvas.ctx.strokeStyle = "#FFFFFF";
 		for(l = 0; l < c.length ; l++){
 			canvas.ctx.beginPath();
+			// Move to the start of this contour
 			canvas.ctx.moveTo(c[l][0].x,c[l][0].y);
-			for(i = 1; i < c[l].length ; i++){
-				canvas.ctx.lineTo(c[l][i].x,c[l][i].y);
-			}
+			// Join the dots
+			for(i = 1; i < c[l].length ; i++) canvas.ctx.lineTo(c[l][i].x,c[l][i].y);
 			canvas.ctx.closePath();
 			canvas.ctx.stroke();
 		}
