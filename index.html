@@ -48,23 +48,30 @@
 		drawAll(thelens, paper);
 
 
+		// If we have the Conrec object available we can plot the critical 
+        // curve, and an outline of the lensed image:
+        
 		var contours = [];
-		// If we have the Conrec object available we now try to contour
+		var lcontours = [];
 		if(typeof Conrec==="function"){
-			// Need to get our 1D array into the right form;
-			// Return our internal 1D representation as a 2D array
+			
+            // Need to get our 1D array into the right form;
+			// Return our internal 1D representation as a 2D array.
 			var i, row, col;
-			var data = new Array(thelens.h);
+            
+            // Critical curve:
+			var invmag = new Array(thelens.h);
 			for(row = 0 ; row < thelens.h ; row++){
-				data[row] = new Array(thelens.w);
+				invmag[row] = new Array(thelens.w);
 				for(col = 0 ; col < thelens.w ; col++){
 					i = row + col*thelens.h;
-					data[row][col] = thelens.mag[i].inverse;
+					invmag[row][col] = thelens.mag[i].inverse;
 				}
 			}
-			var c = contour(data,[0.0]);
-			contours = c.contourList();
+			var critcurve = contour(invmag,[0.0]);
+			contours = critcurve.contourList();
 			drawContours(contours, paper)
+
 		}
 
 
@@ -73,7 +80,8 @@
 		// to the Canvas object. It gets called at some future point so we 
 		// will pass in our lens object too so we make sure we can see it.
 		// Inside the function thelens will be e.data.lens.
-		paper.bind("mousemove",{lens:thelens,contours:contours},function(e){
+	
+        paper.bind("mousemove",{lens:thelens,contours:contours},function(e){
 
 			// Remove existing sources
 			e.data.lens.removeAll('source');
@@ -98,6 +106,21 @@
 			// Draw the image to the canvas (which is "this" in the current context);
 			drawComponent("image", e.data.lens, this);
 
+            // Calculate and overlay arcs outline:
+		    if(typeof Conrec==="function"){
+			    var i, row, col;
+			    var pimage = new Array(thelens.h);
+			    for(row = 0 ; row < thelens.h ; row++){
+				    pimage[row] = new Array(thelens.w);
+				    for(col = 0 ; col < thelens.w ; col++){
+					    i = row + col*thelens.h;
+					    pimage[row][col] = thelens.predictedimage[i];
+				    }
+			    }
+			    var lasso = contour(pimage,[0.1]);
+			    outline = lasso.contourList();
+			    drawContours(outline, this);
+            }
 		});
 
 	}
