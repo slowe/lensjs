@@ -70,7 +70,7 @@
 			}
 			var critcurve = contour(invmag,[0.0]);
 			contours = critcurve.contourList();
-			drawContours(contours, paper)
+			drawContours(contours, paper, {color:'#77FF77'})
 
 		}
 
@@ -98,7 +98,7 @@
 			// saved previously within drawAll().
 			this.overlayFromClipboard("lens");
 			this.overlayFromClipboard("mag");
-			drawContours(contours, this, {color:'#77FF77'});
+			drawContours(contours, this);
 
 			// Re-calculate the lensed image
 			e.data.lens.calculateImage();
@@ -121,6 +121,8 @@
 			    outline = lasso.contourList();
 			    drawContours(outline, this, {color:'#7777FF'});
             }
+            
+            drawComponent("source", e.data.lens, this);
 		});
 
 	}
@@ -211,7 +213,23 @@
 		if(mode == "lens") c = [60, 60, 60];
 		else if(mode == "mag") c = [0, 120, 0];
 		else if(mode == "image") c = [195, 215, 255];
-		
+
+		// We just want to draw sources		
+		if(mode == "source"){
+			canvas.ctx.fillStyle = "#FF9999";
+			canvas.ctx.strokeStyle = "#FFFFFF";
+			for(var i = 0 ; i < lens.source.length ; i++){
+				// Add a circle+label to show where the source is
+				var r = 5;
+				canvas.ctx.beginPath();
+				canvas.ctx.arc(lens.source[i].x-parseInt(r/2), lens.source[i].y-parseInt(r/2), r, 0 , 2 * Math.PI, false);
+				canvas.ctx.strokeText("Source "+(i+1),lens.source[i].x+r, lens.source[i].y+r);
+				canvas.ctx.fill();
+				canvas.ctx.closePath();
+			}
+			return;
+		}
+
 		// Loop over the components
 		for(var i = 0; i < lens.w*lens.h ; i++){
 
@@ -254,19 +272,6 @@
 		// Draw the image to the <canvas> in the DOM
 		canvas.overlay(imgData);
 
-		if(mode == "image"){
-			canvas.ctx.fillStyle = "#FF9999";
-			canvas.ctx.strokeStyle = "#FFFFFF";
-			for(var i = 0 ; i < lens.source.length ; i++){
-				// Add a circle+label to show where the source is
-				var r = 5;
-				canvas.ctx.beginPath();
-				canvas.ctx.arc(lens.source[i].x-parseInt(r/2), lens.source[i].y-parseInt(r/2), r, 0 , 2 * Math.PI, false);
-				canvas.ctx.strokeText("Source",lens.source[i].x+r, lens.source[i].y+r);
-				canvas.ctx.fill();
-				canvas.ctx.closePath();
-			}
-		}
 	}
 	</script>
 
