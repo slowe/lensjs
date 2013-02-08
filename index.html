@@ -98,7 +98,7 @@
 			// saved previously within drawAll().
 			this.overlayFromClipboard("lens");
 			this.overlayFromClipboard("mag");
-			drawContours(contours, this);
+			drawContours(contours, this, {color:'#77FF77'});
 
 			// Re-calculate the lensed image
 			e.data.lens.calculateImage();
