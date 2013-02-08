@@ -98,7 +98,7 @@
 			// saved previously within drawAll().
 			this.overlayFromClipboard("lens");
 			this.overlayFromClipboard("mag");
-			drawContours(contours, this);
+			drawContours(contours, this, {color:'#77FF77'});
 
 			// Re-calculate the lensed image
 			e.data.lens.calculateImage();
@@ -119,7 +119,7 @@
 			    }
 			    var lasso = contour(pimage,[0.1]);
 			    outline = lasso.contourList();
-			    drawContours(outline, this);
+			    drawContours(outline, this, {color:'#7777FF'});
             }
 		});
 
@@ -157,10 +157,11 @@
 		return c;
 	}
 
-	function drawContours(c,canvas){
+	function drawContours(c,canvas,opt){
 		if(c.length < 1) return;
+		var color = (opt && typeof opt.color==="string") ? opt.color : '#FFFFFF';
 		var i, j, l;
-		canvas.ctx.strokeStyle = "#FFFFFF";
+		canvas.ctx.strokeStyle = color;
 		for(l = 0; l < c.length ; l++){
 			canvas.ctx.beginPath();
 			// Move to the start of this contour
