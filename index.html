@@ -83,46 +83,59 @@
 	
         paper.bind("mousemove",{lens:thelens,contours:contours},function(e){
 
+			// Let's have a nice, short name for the lens
+			var l = e.data.lens;
+			// A short name for the canvas object
+			var c = this;
+
 			// Remove existing sources
-			e.data.lens.removeAll('source');
+			l.removeAll('source');
 
 			// Set the lens source to the current cursor position, transforming pixel coords to angular coords:
-			coords = e.data.lens.pix2ang({x:e.x, y:e.y});
-			e.data.lens.add({ plane: 'source', size:  1.25, x: coords.x, y: coords.y });
+			var coords = l.pix2ang({x:e.x, y:e.y});
+			l.add({ plane: 'source', size:  1.25, x: coords.x, y: coords.y });
 
 			// Reset the drawing area - "this" is the canvas in this context
-			this.pasteFromClipboard();
+			c.pasteFromClipboard();
 
 			// We are only changing the lens so the kappa and magnification 
 			// maps haven't changed. Therefore we can use the versions we
 			// saved previously within drawAll().
-			this.overlayFromClipboard("lens");
-			this.overlayFromClipboard("mag");
-			drawContours(contours, this, {color:'#77FF77'});
+			c.overlayFromClipboard("lens");
+			c.overlayFromClipboard("mag");
+			drawContours(contours, c, {color:'#77FF77'});
 
 			// Re-calculate the lensed image
-			e.data.lens.calculateImage();
+			l.calculateImage();
 
 			// Draw the image to the canvas (which is "this" in the current context);
-			drawComponent("image", e.data.lens, this);
+			drawComponent("image", l, c);
 
             // Calculate and overlay arcs outline:
 		    if(typeof Conrec==="function"){
 			    var i, row, col;
-			    var pimage = new Array(thelens.h);
-			    for(row = 0 ; row < thelens.h ; row++){
-				    pimage[row] = new Array(thelens.w);
-				    for(col = 0 ; col < thelens.w ; col++){
-					    i = row + col*thelens.h;
-					    pimage[row][col] = thelens.predictedimage[i];
+			    var pimage = new Array(l.h);
+			    for(row = 0 ; row < l.h ; row++){
+				    pimage[row] = new Array(l.w);
+				    for(col = 0 ; col < l.w ; col++){
+					    i = row + col*l.h;
+					    pimage[row][col] = l.predictedimage[i];
 				    }
 			    }
 			    var lasso = contour(pimage,[0.1]);
 			    outline = lasso.contourList();
-			    drawContours(outline, this, {color:'#7777FF'});
+			    drawContours(outline, c, {color:'#7777FF'});
             }
             
-            drawComponent("source", e.data.lens, this);
+            drawComponent("source", l, c);
+            
+			// Make a message depending on the kappa value
+            var k = l.mag[e.x,e.y].kappa;
+            var msg = "";
+            if(k < 0.2) msg = "Out here the image of the source is only being weakly lensed";
+            if(k >= 0.2 && k < 0.5) msg = "The space around that massive yellow galaxy is being warped, distorting the image of the source";
+            if(k >= 0.5) msg = "The source is right behind the lens now - and is being multiply-imaged";
+			c.canvas.setAttribute('title',msg);
 		});
 
 	}

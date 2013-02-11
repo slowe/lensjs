@@ -83,6 +83,11 @@
 		return this; // Allow this function to be chainable
 	}
 	//----------------------------------------------------------------------------
+	// From an x,y position get the equivalent index in the 1D array
+	Lens.prototype.xy2i = function(x,y){
+		return y + x*this.h;
+	}
+	//----------------------------------------------------------------------------
 	// Coordinate transformations
 	Lens.prototype.pix2ang = function(pix){
 		// Check inputs
