@@ -88,7 +88,7 @@
 	// From an x,y position get the equivalent index in the 1D array
 	Lens.prototype.xy2i = function(x,y){
 		var i = y + x*this.h;
-		if(i > this.w*this.h) i = this.w*this.h;
+		if(i >= this.w*this.h) i = this.w*this.h-1;
 		return i;
 	}
 	//----------------------------------------------------------------------------
