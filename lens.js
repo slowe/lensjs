@@ -58,7 +58,7 @@
 		//   x and y positions (arcsec relative to centre of grid)
 		//   lenses only: theta_e (SIS model, in arcsec)
 		//   sources only: size (Gaussian sigma, in arcsec)
-		
+
 		// Check inputs... coordinates/distances are in arcseconds
 		if(!component) return this;
 		if(!component.plane || typeof component.plane!=="string") return this;
@@ -70,22 +70,26 @@
 		}
 		
 		// Transform angular coordinates and distances to pixel coordinate system:
-		var coords = this.ang2pix({x:component.x, y:component.y})
-		component.x = coords.x
-		component.y = coords.y
-		if(component.plane == "lens") component.theta_e = component.theta_e / this.pixscale
-		if(component.plane == "source") component.size = component.size / this.pixscale
+		var coords = this.ang2pix({x:component.x, y:component.y});
+
+		// Construct a new version of the component otherwise the original gets changed
+		var c = { x : coords.x, y: coords.y, size: component.size, theta_e : component.theta_e, plane : component.plane };
+
+		if(c.plane == "lens") c.theta_e = c.theta_e / this.pixscale
+		if(c.plane == "source") c.size = c.size / this.pixscale
 		
-		// Push the component into the relevant array:
-		if(component.plane == "lens") this.lens.push(component);
-		if(component.plane == "source") this.source.push(component);
-		
+		// Push the c into the relevant array:
+		if(c.plane == "lens") this.lens.push(c);
+		if(c.plane == "source") this.source.push(c);
+
 		return this; // Allow this function to be chainable
 	}
 	//----------------------------------------------------------------------------
 	// From an x,y position get the equivalent index in the 1D array
 	Lens.prototype.xy2i = function(x,y){
-		return y + x*this.h;
+		var i = y + x*this.h;
+		if(i > this.w*this.h) i = this.w*this.h;
+		return i;
 	}
 	//----------------------------------------------------------------------------
 	// Coordinate transformations
