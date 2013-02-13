@@ -81,7 +81,12 @@
 			_obj.getCursor(e);
 			_obj.trigger("mousemove",{x:_obj.cursor.x,y:_obj.cursor.y})
 		});
-	
+		addEvent(this.canvas,"mouseout",function(e){
+			_obj.trigger("mouseout")
+		});
+		addEvent(this.canvas,"mouseover",function(e){
+			_obj.trigger("mouseover")
+		});
 		return this;
 	}
 
@@ -124,7 +129,7 @@
 		return ctx.getImageData(0, 0, w, h);
 	
 	}
-	
+
 	Canvas.prototype.overlay = function(imageData){
 	
 		// Because of the way putImageData replaces all the pixel values, 
