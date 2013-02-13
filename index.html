@@ -136,6 +136,7 @@
             if(k >= 0.2 && k < 0.5) msg = "The space around that massive yellow galaxy is being warped, distorting the image of the source";
             if(k >= 0.5) msg = "The source is right behind the lens now - and is being multiply-imaged";
 			c.canvas.setAttribute('title',msg);
+            // Bug: the pop up yellow box of text does not change as I move around the image!
 		});
 
 	}
@@ -222,21 +223,21 @@
 		var pos = 0;
 		var c = [0, 0, 0];
 
-		// The RGB colours
+		// The RGB colours of various things:
 		if(mode == "lens") c = [60, 60, 60];
 		else if(mode == "mag") c = [0, 120, 0];
 		else if(mode == "image") c = [195, 215, 255];
 
-		// We just want to draw sources		
+		// Draw a source on the end of the mouse:		
 		if(mode == "source"){
-			canvas.ctx.fillStyle = "#FF9999";
+			canvas.ctx.fillStyle = "#00FFFF";
 			canvas.ctx.strokeStyle = "#FFFFFF";
 			for(var i = 0 ; i < lens.source.length ; i++){
 				// Add a circle+label to show where the source is
 				var r = 5;
 				canvas.ctx.beginPath();
 				canvas.ctx.arc(lens.source[i].x-parseInt(r/2), lens.source[i].y-parseInt(r/2), r, 0 , 2 * Math.PI, false);
-				canvas.ctx.strokeText("Source "+(i+1),lens.source[i].x+r, lens.source[i].y+r);
+				// canvas.ctx.strokeText("Source "+(i+1),lens.source[i].x+r, lens.source[i].y+r);
 				canvas.ctx.fill();
 				canvas.ctx.closePath();
 			}
@@ -339,7 +340,8 @@
 	
         <p>The mass density is shown in gray, while the green<br>
         shapes are the "critical curves." This is where the <br>
-        highly-magnified images form. These are shown in blue. </p>
+        highly-magnified images form. These images - the arcs 
+        and rings - are shown in blue. </p>
     
 		<p><a href="https://github.com/slowe/lensjs">https://github.com/slowe/lensjs</a></p>
 	</div>
