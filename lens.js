@@ -160,19 +160,23 @@
 	Lens.prototype.calculateImage = function(){
 		// Define some variables outside of the loop
 		// as declaring them is expensive
-		var delta = { x: 0, y: 0 };
+		var d = { x: 0, y: 0 };
 		var i = 0;
 		var r2 = 0;
-		var row, col;
+		var ns = this.source.length;
+		var row, col, s, v;
 		// Loop over x and y. Store 1-D pixel index as i.
 		for(row = 0 ; row < this.h ; row++){
 			for(col = 0 ; col < this.w ; col++){
-				delta.x = col - this.source[0].x - this.alpha[i].x;
-				delta.y = row - this.source[0].y - this.alpha[i].y;
-				r2 = ( delta.x*delta.x + delta.y*delta.y );
-				this.predictedimage[i] = Math.exp(-r2/50.0);
-					  // MAGIC number sigma=5 pixels, unlensed source radius...
-				i++;
+				v = 0;
+				for(s = 0 ; s < ns ; s++){
+					d.x = col - this.source[0].x - this.alpha[i].x;
+					d.y = row - this.source[0].y - this.alpha[i].y;
+					r2 = ( d.x*d.x + d.y*d.y );
+					v += Math.exp(-r2/50.0);
+						// MAGIC number sigma=5 pixels, unlensed source radius...
+				}
+				this.predictedimage[i++] = v;
 			}
 		}
 		
