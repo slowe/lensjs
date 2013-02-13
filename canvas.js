@@ -96,7 +96,7 @@
 
 	Canvas.prototype.blur = function(imageData, gl){
 	
-		var steps = 5;
+		var steps = 3;
 		var w = gl.w;
 		var h = gl.h;
 		var scale = 4;
@@ -118,8 +118,8 @@
 		// Convolution with square top hat kernel, by shifting and redrawing image...
 		// Does not get brightness quite right...
 		for (var i=0;i<steps;i++) {
-			var scaledW = Math.max(1,Math.round(smallW - i));
-			var scaledH = Math.max(1,Math.round(smallH - i));
+			var scaledW = Math.max(1,Math.round(smallW - 2*i));
+			var scaledH = Math.max(1,Math.round(smallH - 2*i));
 			
 			copyCtx.clearRect(0,0,smallW,smallH);
 			copyCtx.drawImage(canvas, 0, 0, w, h, 0, 0, scaledW, scaledH);
