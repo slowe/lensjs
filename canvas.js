@@ -242,6 +242,7 @@
 	// Cross-browser way to add an event
 	if(typeof addEvent!="function"){
 		function addEvent(oElement, strEvent, fncHandler){
+			if(!oElement) return;
 			if(oElement.addEventListener) oElement.addEventListener(strEvent, fncHandler, false);
 			else if(oElement.attachEvent) oElement.attachEvent("on" + strEvent, fncHandler);
 		}
