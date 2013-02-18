@@ -259,9 +259,10 @@
 		if (typeof window === 'undefined') return;
 		var style;
 		var el = document.getElementById(el);
-		if (el.currentStyle) style = el.currentStyle[styleProp];
+		if(!el) return null;
+		if(el.currentStyle) style = el.currentStyle[styleProp];
 		else if (window.getComputedStyle) style = document.defaultView.getComputedStyle(el, null).getPropertyValue(styleProp);
-		if (style && style.length === 0) style = null;
+		if(style && style.length === 0) style = null;
 		return style;
 	}
 })(typeof exports !== "undefined" ? exports : window);
