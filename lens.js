@@ -92,16 +92,16 @@
 		return i;
 	}
 	//----------------------------------------------------------------------------
-	// Coordinate transformations
+	// Coordinate transformations - note that canvas y runs from top to bottom!
 	Lens.prototype.pix2ang = function(pix){
 		// Check inputs
 		if(!pix || typeof pix.x!=="number" || typeof pix.y!=="number") return { x: 0, y: 0 };
-		return { x: (pix.x - this.w/2)*this.pixscale , y: (pix.y - this.h/2)*this.pixscale };
+		return { x: (pix.x - this.w/2)*this.pixscale , y: (this.h/2 - pix.y)*this.pixscale };
 	}
 	Lens.prototype.ang2pix = function(ang){
 		// Check inputs
 		if(!ang || typeof ang.x!=="number" || typeof ang.y!=="number") return { x: 0, y: 0 };
-		return { x: Math.round(ang.x / this.pixscale + this.w/2), y: Math.round(ang.y / this.pixscale + this.h/2) } 
+		return { x: Math.round(ang.x / this.pixscale + this.w/2), y: Math.round(this.h/2 - ang.y / this.pixscale) } 
 	}
 	//----------------------------------------------------------------------------
 	// Cleaning up (typically before replotting)
