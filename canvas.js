@@ -242,6 +242,7 @@
 	// Cross-browser way to add an event
 	if(typeof addEvent!="function"){
 		function addEvent(oElement, strEvent, fncHandler){
+			if(!oElement) return;
 			if(oElement.addEventListener) oElement.addEventListener(strEvent, fncHandler, false);
 			else if(oElement.attachEvent) oElement.attachEvent("on" + strEvent, fncHandler);
 		}
@@ -259,9 +260,10 @@
 		if (typeof window === 'undefined') return;
 		var style;
 		var el = document.getElementById(el);
-		if (el.currentStyle) style = el.currentStyle[styleProp];
+		if(!el) return null;
+		if(el.currentStyle) style = el.currentStyle[styleProp];
 		else if (window.getComputedStyle) style = document.defaultView.getComputedStyle(el, null).getPropertyValue(styleProp);
-		if (style && style.length === 0) style = null;
+		if(style && style.length === 0) style = null;
 		return style;
 	}
 })(typeof exports !== "undefined" ? exports : window);
