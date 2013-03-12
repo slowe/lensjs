@@ -163,6 +163,8 @@
 		var d = { x: 0, y: 0 };
 		var i = 0;
 		var r2 = 0;
+        var factor = 1.0/(0.693*this.source[0].size*this.source[0].size)
+        // Since for a Gaussian, half light radius (size) = sigma * sqrt(2*ln(2))
 		var ns = this.source.length;
 		var row, col, s, v;
 		// Loop over x and y. Store 1-D pixel index as i.
@@ -173,8 +175,10 @@
 					d.x = col - this.source[0].x - this.alpha[i].x;
 					d.y = row - this.source[0].y - this.alpha[i].y;
 					r2 = ( d.x*d.x + d.y*d.y );
-					v += Math.exp(-r2/50.0);
-						// MAGIC number sigma=5 pixels, unlensed source radius...
+					// MAGIC number sigma=5 pixels, unlensed source radius...
+					// v += Math.exp(-r2/50.0);
+                    // Using correct source size:
+					v += Math.exp(-factor*r2);
 				}
 				this.predictedimage[i++] = v;
 			}
