@@ -76,7 +76,7 @@
 		var c = { x : coords.x, y: coords.y, theta_e: component.theta_e, plane : component.plane };
 
 		if(c.plane == "lens"){
-			c.theta_e = c.theta_e;
+			c.theta_e = component.theta_e;
 			c.theta_e_px = c.theta_e / this.pixscale;
 		}
 		if(c.plane == "source"){
