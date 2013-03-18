@@ -95,7 +95,7 @@
 	}
 
 	Canvas.prototype.blur = function(imageData, gl){
-	
+
 		var steps = 3;
 		var w = gl.w;
 		var h = gl.h;
