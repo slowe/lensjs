@@ -73,11 +73,17 @@
 		var coords = this.ang2pix({x:component.x, y:component.y});
 
 		// Construct a new version of the component otherwise the original gets changed
-		var c = { x : coords.x, y: coords.y, size: component.size, theta_e : component.theta_e, plane : component.plane };
+		var c = { x : coords.x, y: coords.y, theta_e: component.theta_e, plane : component.plane };
 
-		if(c.plane == "lens") c.theta_e = c.theta_e / this.pixscale
-		if(c.plane == "source") c.size = c.size / this.pixscale
-		
+		if(c.plane == "lens"){
+			c.theta_e = c.theta_e;
+			c.theta_e_px = c.theta_e / this.pixscale;
+		}
+		if(c.plane == "source"){
+			c.size = component.size;
+			c.size_px = c.size / this.pixscale;
+		}
+
 		// Push the c into the relevant array:
 		if(c.plane == "lens") this.lens.push(c);
 		if(c.plane == "source") this.source.push(c);
@@ -135,9 +141,9 @@
 				costwophi = 1 - 2*sinphi*sinphi;
 				sintwophi = 2*sinphi*cosphi;
 				// Add lensing effects of just this component:
-				this.alpha[i].x += this.lens[j].theta_e*cosphi;
-				this.alpha[i].y += this.lens[j].theta_e*sinphi;
-				kappa = 0.5 * this.lens[j].theta_e / r
+				this.alpha[i].x += this.lens[j].theta_e_px*cosphi;
+				this.alpha[i].y += this.lens[j].theta_e_px*sinphi;
+				kappa = 0.5 * this.lens[j].theta_e_px / r
 				this.mag[i].kappa += kappa;
 				// SIS shortcut:
 				// this.mag[i].gamma1 += kappa * costwophi;
@@ -163,7 +169,7 @@
 		var d = { x: 0, y: 0 };
 		var i = 0;
 		var r2 = 0;
-        var factor = 1.0/(0.693*this.source[0].size*this.source[0].size)
+        var factor = 1.0/(0.693*this.source[0].size_px*this.source[0].size_px)
         // Since for a Gaussian, half light radius (size) = sigma * sqrt(2*ln(2))
 		var ns = this.source.length;
 		var row, col, s, v;
