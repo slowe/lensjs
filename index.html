@@ -280,7 +280,7 @@
 
 		if(mode == "image"){
 			// Blur the image
-			imgData = canvas.blur(imgData, lens);
+			imgData = canvas.blur(imgData, lens.w, lens.h);
 		}
 
 		// Draw the image to the <canvas> in the DOM

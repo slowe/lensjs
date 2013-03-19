@@ -91,10 +91,16 @@
 		return this; // Allow this function to be chainable
 	}
 	//----------------------------------------------------------------------------
-	// From an x,y position get the equivalent index in the 1D array
+	// From an x,y position in pixel coords, 
+    // get the equivalent index in the 1D array
 	Lens.prototype.xy2i = function(x,y){
 		var i = y + x*this.h;
 		if(i >= this.w*this.h) i = this.w*this.h-1;
+		return i;
+	}
+	Lens.prototype.altxy2i = function(x,y){
+		var i = x + y*this.w;
+		if(i >= this.h*this.w) i = this.h*this.w-1;
 		return i;
 	}
 	//----------------------------------------------------------------------------
@@ -145,16 +151,13 @@
 				this.alpha[i].y += this.lens[j].theta_e_px*sinphi;
 				kappa = 0.5 * this.lens[j].theta_e_px / r
 				this.mag[i].kappa += kappa;
-				// SIS shortcut:
-				// this.mag[i].gamma1 += kappa * costwophi;
-				// this.mag[i].gamma2 += kappa * sintwophi;
+				this.mag[i].gamma1 += kappa * costwophi;
+				this.mag[i].gamma2 += kappa * sintwophi;
 			}
 			// Inverse magnification at this pixel:
-			// this.mag[i].inverse = (1.0-this.mag[i].kappa)*(1.0-this.mag[i].kappa) - this.mag[i].gamma1*this.mag[i].gamma1 - this.mag[i].gamma2*this.mag[i].gamma2
-			// SIS shortcut:
-			this.mag[i].inverse = 1.0 - 2.0*this.mag[i].kappa
+			this.mag[i].inverse = (1.0-this.mag[i].kappa)*(1.0-this.mag[i].kappa) - this.mag[i].gamma1*this.mag[i].gamma1 - this.mag[i].gamma2*this.mag[i].gamma2
 		}
-		// TO BE CONTINUED...
+		// TO BE TRANSFERRED FROM LENSWRANGLER...
 		// Calculate critical curve as set of x,y points:
 		//   this.critcurve = contour(this.w,this.h,this.mag.inverse,0.0)
 		// Map to the source plane to get corresponding caustic:

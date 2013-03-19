@@ -94,11 +94,9 @@
 		this.ctx.clearRect(0,0,this.width,this.height);
 	}
 
-	Canvas.prototype.blur = function(imageData, gl){
+	Canvas.prototype.blur = function(imageData, w, h){
 	
 		var steps = 3;
-		var w = gl.w;
-		var h = gl.h;
 		var scale = 4;
 		// Kernel width 0.9", trades off with alpha channel...
 		var smallW = Math.round(w / scale);
