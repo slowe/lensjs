@@ -27,6 +27,7 @@
 		this.source = [];
 		// Some working arrays:
 		this.predictedimage = [];
+		this.trueimage = [];
 		this.alpha = []
 		  
 		// Sanity check the input. We must get a width, a height and a pixscale (arcseconds/pixel)
@@ -40,8 +41,9 @@
 		this.h = input.height;
 		this.pixscale = input.pixscale;
 		// Create 1D arrays
-		// 1) array to hold the predicted image
+		// 1) array to hold the predicted and true image
 		this.predictedimage = new Array(this.w*this.h);
+		this.trueimage = new Array(this.w*this.h);
 		// 2) arrays to hold vector alpha at each (x,y)
 		this.alpha = new Array(this.w*this.h);
 		// 3) arrays to hold tensor magnification (kappa, gamma etc) at each (x,y)
@@ -190,6 +192,37 @@
 					v += Math.exp(-factor*r2);
 				}
 				this.predictedimage[i++] = v;
+			}
+		}
+		
+		return this; // Allow this function to be chainable
+	}
+	//----------------------------------------------------------------------------
+	// This function will populate this.trueimage
+	Lens.prototype.calculateTrueImage = function(){
+		// Define some variables outside of the loop
+		// as declaring them is expensive
+		var d = { x: 0, y: 0 };
+		var i = 0;
+		var r2 = 0;
+        var factor = 1.0/(0.693*this.source[0].size_px*this.source[0].size_px)
+        // Since for a Gaussian, half light radius (size) = sigma * sqrt(2*ln(2))
+		var ns = this.source.length;
+		var row, col, s, v;
+		// Loop over x and y. Store 1-D pixel index as i.
+		for(row = 0 ; row < this.h ; row++){
+			for(col = 0 ; col < this.w ; col++){
+				v = 0;
+				for(s = 0 ; s < ns ; s++){
+					d.x = col - this.source[0].x;
+					d.y = row - this.source[0].y;
+					r2 = ( d.x*d.x + d.y*d.y );
+					// MAGIC number sigma=5 pixels, unlensed source radius...
+					// v += Math.exp(-r2/50.0);
+                    // Using correct source size:
+					v += Math.exp(-factor*r2);
+				}
+				this.trueimage[i++] = v;
 			}
 		}
 		
